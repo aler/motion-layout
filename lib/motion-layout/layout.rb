@@ -3,6 +3,8 @@ module Motion
     def initialize(&block)
       @verticals   = []
       @horizontals = []
+      @center_x    = []
+      @center_y    = []
       @metrics     = {}
 
       yield self
@@ -29,6 +31,14 @@ module Motion
       @verticals << vertical
     end
 
+    def center_x(view)
+      @center_x << view
+    end
+
+    def center_y(view)
+      @center_y << view
+    end
+
     private
 
     def strain
@@ -43,6 +53,12 @@ module Motion
       end
       constraints += @horizontals.map do |horizontal|
         NSLayoutConstraint.constraintsWithVisualFormat("H:#{horizontal}", options:NSLayoutFormatAlignAllCenterY, metrics:@metrics, views:@subviews)
+      end
+      constraints += @center_x.map do |v|
+        NSLayoutConstraint.constraintWithItem(@view, attribute:NSLayoutAttributeCenterX, relatedBy:NSLayoutRelationEqual, toItem:v, attribute:NSLayoutAttributeCenterX, multiplier:1, constant:0)
+      end
+      constraints += @center_y.map do |v|
+        NSLayoutConstraint.constraintWithItem(@view, attribute:NSLayoutAttributeCenterY, relatedBy:NSLayoutRelationEqual, toItem:v, attribute:NSLayoutAttributeCenterY, multiplier:1, constant:0)
       end
 
       @view.addConstraints(constraints.flatten)
